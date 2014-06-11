@@ -7,5 +7,5 @@ Simple gitlabHQ API REST wrapper
 * put/get 
 * list (get with full pagination)
 
-# recommanded dependencies
+# recommended dependencies
 * yks
