@@ -1,0 +1,21 @@
+{
+  "name": "gitlab",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "private": true,
+  "dependencies": {
+    "async-co": "^0.10.0",
+    "co": "^4.6.0",
+    "co-parallel": "^1.0.0",
+    "mout": "^0.11.0",
+    "nyks": "^2.20.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
