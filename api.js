@@ -7,8 +7,10 @@ var url         = require('url');
 var credentials = require('./credentials.json');
 var promisify   = require('nyks/function/promisify');
 var request     = require('nyks/http/request');
+var read        = require('read');
 var mixIn       = require('mout/object/mixIn');
 var prequest    = promisify(request);
+var pread       = promisify(read);
 var interpolate = require('mout/string/interpolate');
 
 var eachLimit   = require('async-co/eachLimit');
@@ -28,14 +30,19 @@ var format = function(endpoint, qs){
 }
 
 var list_projects = function*(endpoint, chain){
-  var query = format("/projects/all", {per_page : 100} );
+  var per_page = 100;
+  var query = format("/projects/all", {per_page} );
 
+    //use request (and no rq, as we need all args to fetch headers)
   var tmp = yield request.bind(null, query ),
       projects = tmp[0],
       headers= tmp[1].headers;
 
-  for(var page=1 ; page < headers["x-total-pages"]; page++)
-    [].push.apply(projects, yield rq("/projects/all", {per_page : 100, page} ));
+
+  for(var page=1, tmp; page <= headers["x-total-pages"]; page++) {
+    tmp = yield rq("/projects/all", {per_page, page} );
+    Array.prototype.push.apply(projects, tmp);
+  }
 
   return Promise.resolve(projects);
 }
@@ -45,7 +52,7 @@ var rq = function(endpoint, qs){
   return prequest( format.apply(null, arguments) );
 }
 
-var call = function(endpoint, params){
+var call = function *(endpoint, params){
    console.log("Sending ", params, "to", endpoint);
 
    endpoint = interpolate(endpoint, params);
@@ -55,6 +62,9 @@ var call = function(endpoint, params){
    query.headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
   }
+
+  if(false)
+    yield pread({prompt:"Are you sure (CRL+C to cancel)"});
 
    return prequest(query, params);
 }
@@ -71,8 +81,7 @@ co(function*(){
     throw "You are not admin";
 
   var projects = yield list_projects();
-
-  console.log(projects.length);
+  console.log("Found %d projects to work with", projects.length);
 
   yield eachLimit(projects, 1, function*(project){
     console.log("Checking %s#%s", project.name, project.id);
