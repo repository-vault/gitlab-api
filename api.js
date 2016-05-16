@@ -38,8 +38,7 @@ var list_projects = function*(endpoint, chain){
       projects = tmp[0],
       headers= tmp[1].headers;
 
-
-  for(var page=1, tmp; page <= headers["x-total-pages"]; page++) {
+  for(var page=2, tmp; page <= headers["x-total-pages"]; page++) {
     tmp = yield rq("/projects/all", {per_page, page} );
     Array.prototype.push.apply(projects, tmp);
   }
