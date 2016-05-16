@@ -49,7 +49,7 @@ class api {
         headers= tmp[1].headers;
 
     for(var page=2, tmp; page <= headers["x-total-pages"]; page++) {
-      tmp = yield rq("/projects/all", {per_page, page} );
+      tmp = yield this.rq("/projects/all", {per_page, page} );
       Array.prototype.push.apply(projects, tmp);
     }
 

@@ -1,9 +1,8 @@
 {
-  "name": "gitlab-co",
+  "name": "gitlab-api",
   "version": "1.0.0",
   "description": "Gitlab API helper",
   "main": "index.js",
-  "private": true,
   "dependencies": {
     "async-co": "^0.10.0",
     "co": "^4.6.0",
