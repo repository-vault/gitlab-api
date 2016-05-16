@@ -9,7 +9,8 @@
     "co": "^4.6.0",
     "co-parallel": "^1.0.0",
     "mout": "^0.11.0",
-    "nyks": "^2.20.0"
+    "nyks": "^2.20.0",
+    "read": "^1.0.7"
   },
   "devDependencies": {},
   "scripts": {
