@@ -1,13 +1,12 @@
 {
-  "name": "gitlab",
+  "name": "gitlab-co",
   "version": "1.0.0",
-  "description": "",
+  "description": "Gitlab API helper",
   "main": "index.js",
   "private": true,
   "dependencies": {
     "async-co": "^0.10.0",
     "co": "^4.6.0",
-    "co-parallel": "^1.0.0",
     "mout": "^0.11.0",
     "nyks": "^2.20.0",
     "read": "^1.0.7"
@@ -17,6 +16,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Francois Leurent <131.js@cloudyks.org>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/131/gitlab-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/131/gitlab-api/issues"
+  },
+  "homepage": "https://github.com/131/gitlab-api"
 }
