@@ -1,6 +1,6 @@
 {
   "name": "gitlab-api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Gitlab API helper",
   "main": "index.js",
   "dependencies": {
