@@ -39,7 +39,7 @@ class api {
   }
 
 
-   * list_projects(endpoint, chain){
+   * list_projects(endpoint){
     var per_page = 100;
     var query = this.format("/projects/all", {per_page} );
 
@@ -55,6 +55,12 @@ class api {
 
     return Promise.resolve(projects);
   }
+
+   * list_groups(endpoint) {
+    var groups = yield this.rq("/groups", {per_page:100});
+    return Promise.resolve(groups);
+  }
+
 
       //helper to fetch changelogs between two references
   * changelog(project, ref_name, bottom) {
