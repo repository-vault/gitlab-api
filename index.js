@@ -3,15 +3,16 @@
 var url         = require('url');
 
 var promisify   = require('nyks/function/promisify');
-var request     = require('nyks/http/request');
 var read        = require('read');
 var mixIn       = require('mout/object/mixIn');
-var prequest    = promisify(request);
+var request     = promisify(require('nyks/http/request'));
 var pread       = promisify(read);
 var interpolate = require('mout/string/interpolate');
 var encode      = require('mout/queryString/encode');
 var trim        = require('mout/string/trim');
 var pluck       = require('mout/array/pluck');
+var drain       = require('nyks/stream/drain');
+const json      = require('nyks/stream/json');
 
 
 class api {
@@ -29,46 +30,57 @@ class api {
     query     = url.parse(query);
     query.qs  = this.credentials;
     if(qs)  mixIn(query.qs, qs);
-    query.json = true;
     return query;
   }
 
     //simple REST (get) call
   rq(endpoint, qs){
-    return prequest( this.format.apply(this, arguments) );
+    return request(this.format.apply(this, arguments));
   }
 
 
-   * list_projects(endpoint){
+  async list_users() {
+    var users = await json(this.rq("/users", {per_page:100}));
+    return users;
+  }
+
+
+  async list_projects() {
     var per_page = 100;
-    var query = this.format("/projects/all", {per_page} );
 
-      //use request (and no rq, as we need all args to fetch headers)
-    var tmp = yield request.bind(null, query ),
-        projects = tmp[0],
-        headers= tmp[1].headers;
+    var req = await this.rq("/projects", {per_page} );
+    var pages  = res.headers["x-total-pages"];
+    var projects = await json(res);
 
-    for(var page=2, tmp; page <= headers["x-total-pages"]; page++) {
-      tmp = yield this.rq("/projects/all", {per_page, page} );
+    for(var page=2, tmp; page <= pages; page++) {
+      tmp = await json(this.rq("/projects", {per_page, page} ));
       Array.prototype.push.apply(projects, tmp);
     }
 
-    return Promise.resolve(projects);
+    return projects;
   }
 
-   * list_groups(endpoint) {
-    var groups = yield this.rq("/groups", {per_page:100});
-    return Promise.resolve(groups);
+   async list_groups() {
+    var groups = await json(this.rq("/groups", {per_page:100}));
+    return groups;
   }
 
+  async pages(ns) {
+    var res = await this.rq(ns, {per_page:1});
+    return res.headers["x-total-pages"];
+  }
+
+  item(ns, page) {
+    return json(this.rq(ns, {per_page:1, page})).then( body => body[0]);
+  }
 
       //helper to fetch changelogs between two references
-  * changelog(project, ref_name, bottom) {
+  async changelog(project, ref_name, bottom) {
     var per_page = 100, page = 0;
     var log = [];
 
     do {
-      let tmp = yield this.rq("/projects/{{id}}/repository/commits", {id:project, per_page, ref_name, page});
+      let tmp = await json(this.rq("/projects/{{id}}/repository/commits", {id:project, per_page, ref_name, page}));
       log.push.apply(log,  tmp);
 
       let i = pluck(log, "id").indexOf(bottom);
@@ -83,7 +95,26 @@ class api {
   }
 
 
-  * put(endpoint, params){
+
+  async post(endpoint, params){
+    console.log("Sending ", params, "to", endpoint);
+
+    var query = mixIn(this.format(endpoint, params), {method: 'POST'});
+
+    params = trim(encode(params), "?");
+    query.headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
+
+    if(false)
+      await pread({prompt:"Are you sure (CRL+C to cancel)"});
+
+    return request(query, params);
+  }
+
+
+
+  async put(endpoint, params){
    console.log("Sending ", params, "to", endpoint);
 
    var query = mixIn(this.format(endpoint, params), {method: 'PUT'});
@@ -94,9 +125,9 @@ class api {
   }
 
   if(false)
-    yield pread({prompt:"Are you sure (CRL+C to cancel)"});
+    await pread({prompt:"Are you sure (CRL+C to cancel)"});
 
-   return prequest(query, params);
+   return request(query, params);
 }
 
 

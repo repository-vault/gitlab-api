@@ -4,11 +4,10 @@
   "description": "Gitlab API helper",
   "main": "index.js",
   "dependencies": {
-    "async-co": "^1.7.0",
     "glob": "^7.1.1",
     "minimatch": "^3.0.4",
     "mout": "^1.0.0",
-    "nyks": "^3.19.0",
+    "nyks": "^4.1.10",
     "read": "^1.0.7"
   },
   "devDependencies": {},
